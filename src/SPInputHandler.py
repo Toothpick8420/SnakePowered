@@ -8,7 +8,7 @@ directions_pushed: list[str] = []
 
 
 # Keyboard input handling
-valid_keys = [key.W, key.A, key.S, key.D, key.UP, key.LEFT, key.DOWN, key.RIGHT]
+valid_keys = [key.W, key.A, key.S, key.D]
 
 
 def on_key_press(symbol: key, modifier: key) -> None:
