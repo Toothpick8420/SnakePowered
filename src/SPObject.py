@@ -1,19 +1,22 @@
 # All objects in the game should be created with this object or extend it
 
-import pyglet
-from pyglet import clock, window
+from pyglet import clock, image, sprite, window
 import SPInputHandler as IH
 
-class SPObject(pyglet.sprite.Sprite):
+
+class SPObject(sprite.Sprite):
 
     ALL_OBJS = []  # A list to store all created objects
 
-    def __init__(self, file_path: str,
-            x_loc: float, 
-            y_loc: float, 
-            has_focus: bool = False) -> None:
+    def __init__(
+        self,
+        file_path: str,
+        x_loc: float = 0,
+        y_loc: float = 0,
+        has_focus: bool = False,
+    ) -> None:
         # Call the super constructor with the created sprite
-        sprite: pyglet.image.AbstractImage = pyglet.image.load(file_path)
+        sprite: image.AbstractImage = image.load(file_path)
         super(SPObject, self).__init__(sprite, x_loc, y_loc)
         # Object velocity
         self.x_vel: float = 0

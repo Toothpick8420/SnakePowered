@@ -3,6 +3,7 @@
 
 from pyglet.window import key
 
+
 # A list of the directions pressed for movement
 directions_pushed: list[str] = []
 

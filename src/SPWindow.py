@@ -1,11 +1,11 @@
 # The window is where everything is drawn and where everything is connected to
-import pyglet
-from pyglet import clock
+
+from pyglet import clock, window
 import SPInputHandler
 from SPObject import SPObject
 
 
-class SPWindow(pyglet.window.Window):
+class SPWindow(window.Window):
 
     # Pre: Passed a width and height > 0 and the windows title
     # Post: Create a pyglet window with the passed params
@@ -14,7 +14,6 @@ class SPWindow(pyglet.window.Window):
         # Call the super constructor -> pyglet.window.Window
         super(SPWindow, self).__init__(width, height, title)
         # Set up the controls, including a controller if applicable
-        # FIXME: Add controller support
         self.attachHandlers()
         # Clock to call drawFrame 60 times a second
         clock.schedule_interval(self.drawFrame, 1 / 60.0)
