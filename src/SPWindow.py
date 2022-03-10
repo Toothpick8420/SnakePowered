@@ -1,8 +1,8 @@
 # The window is where everything is drawn and where everything is connected to
 
 from pyglet import clock, window
-import SPInputHandler
-from SPObject import SPObject
+from .import SPInputHandler
+from .SPObject import SPObject
 
 
 class SPWindow(window.Window):
@@ -29,25 +29,22 @@ class SPWindow(window.Window):
     # Post: Calls the objects off<Direction> and returns flag
     # Descr: Check if the object is off the screen at all
     def checkOffScreen(self, obj: SPObject) -> bool:
-        offscreen: bool = False
 
         # Makes sure the entire obj is off the screen
-        if obj.x + obj.width < 0:
+        if obj.x< 0:
             obj.offLeft()
             offscreen = True
-        elif obj.x > self.width:
+        elif obj.x + obj.width > self.width:
             obj.offRight()
             offscreen = True
         # Makes sure the entire obj is off the screen
-        elif obj.y + obj.height < 0:
+        elif obj.y < 0:
             obj.offBottom()
             offscreen = True
-        elif obj.y > self.height:
+        elif obj.y + obj.height > self.height:
             obj.offTop()
             offscreen = True
 
-        # Return a flag to tell window to not draw if obj is off screen
-        return offscreen
 
     # Pre: None
     # Post: All objects are drawn to the screen
@@ -56,6 +53,5 @@ class SPWindow(window.Window):
         self.clear()
         # Iterate over all created objects
         for obj in SPObject.ALL_OBJS:
-            if self.checkOffScreen(obj):
-                continue
+            self.checkOffScreen(obj)
             obj.draw()
