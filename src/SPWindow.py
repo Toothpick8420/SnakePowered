@@ -25,14 +25,37 @@ class SPWindow(window.Window):
         self.on_key_press = SPInputHandler.on_key_press
         self.on_key_release = SPInputHandler.on_key_release
 
-    # FIXME: Frames taking too long to load -> dt greater than 1/60.
+    # Pre: Passed an object with a location
+    # Post: Calls the objects off<Direction> and returns flag
+    # Descr: Check if the object is off the screen at all
+    def checkOffScreen(self, obj: SPObject) -> bool:
+        offscreen: bool = False
+
+        # Makes sure the entire obj is off the screen
+        if obj.x + obj.width < 0:
+            obj.offLeft()
+            offscreen = True
+        elif obj.x > self.width:
+            obj.offRight()
+            offscreen = True
+        # Makes sure the entire obj is off the screen
+        elif obj.y + obj.height < 0:
+            obj.offBottom()
+            offscreen = True
+        elif obj.y > self.height:
+            obj.offTop()
+            offscreen = True
+
+        # Return a flag to tell window to not draw if obj is off screen
+        return offscreen
 
     # Pre: None
     # Post: All objects are drawn to the screen
     # Descr: Called 60 times a second to draw all the objects to the screen
     def drawFrame(self, dt: float) -> None:
-        print("SPWindow: Drawing frame")
         self.clear()
         # Iterate over all created objects
         for obj in SPObject.ALL_OBJS:
+            if self.checkOffScreen(obj):
+                continue
             obj.draw()

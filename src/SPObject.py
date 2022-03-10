@@ -27,26 +27,7 @@ class SPObject(sprite.Sprite):
         # Add the created object to the list of objects
         SPObject.ALL_OBJS.append(self)
         # Schedule the update function to be called every 60 seconds
-        clock.schedule_interval(SPObject.tick, 1/60.)
-
-    # Pre: None
-    # Post: Velocity is updated
-    # Descr: Update the velocity based on stored keys from SPInputHandler
-    def checkKeysPressed(self) -> None:
-        # Vertical movement
-        if window.key.W in IH.directions_pushed:
-            self.accelerateUp()
-        elif window.key.S in IH.directions_pushed:
-            self.accelerateDown()
-        else:
-            self.y_vel = 0
-        # Horizontal movement
-        if window.key.A in IH.directions_pushed: 
-            self.accelerateLeft()
-        elif window.key.D in IH.directions_pushed:
-            self.accelerateRight()
-        else:
-            self.x_vel = 0
+        clock.schedule_interval(SPObject.tick, 1 / 60.0)
 
     # Pre: None
     # Post: Object velocity changed to move direction
@@ -70,11 +51,29 @@ class SPObject(sprite.Sprite):
     def tick(dt: float) -> None:
         # Iterate over all objects
         for obj in SPObject.ALL_OBJS:
-            # Check keyboard focus for movement
-            if obj.has_focus:
-                obj.checkKeysPressed()
             # Get the new location
             new_x: float = obj.x + obj.x_vel
             new_y: float = obj.y + obj.y_vel
             # Update the location
             obj.update(new_x, new_y)
+
+    # ABSTRACT FUNCTIONS MEANT TO BE OVERLOADED
+
+    # Pre: Object is off<side> of the screen
+    # Post: Action is performed due to being off screen
+    # Descr: Performs an action upon leaving the screen
+    def offTop(self) -> None:
+        print("SPObject: OffTop")
+        pass
+
+    def offBottom(self) -> None:
+        print("SPObject: offBottom")
+        pass
+
+    def offLeft(self) -> None:
+        print("SPObject: offLeft")
+        pass
+
+    def offRight(self) -> None:
+        print("SPObject: offRight")
+        pass
