@@ -1,7 +1,7 @@
 # All objects in the game should be created with this object or extend it
 
 from pyglet import clock, image, sprite, window
-import SPInputHandler as IH
+from . import SPInputHandler as IH
 
 
 class SPObject(sprite.Sprite):
@@ -44,6 +44,18 @@ class SPObject(sprite.Sprite):
     def accelerateLeft(self) -> None:
         self.x_vel = -(self.mvmt_spd)
 
+    # Pre: Passed object and self have correct hitboxs
+    # Post: Returns True if hitboxes overlap
+    # Descr: Compares hitboxes of 2 objects to check for collision
+    def hasCollided(self, obj) -> bool:
+        
+        # Right edge of Self to the left edge of obj
+        return (
+            self.x + self.width > obj.x
+            and self.x < obj.x + obj.width
+            and self.y < obj.y + obj.height
+            and self.y + self.height > obj.y
+        )
 
     # Pre: None
     # Post: All objects location has been updated with velocity
@@ -51,29 +63,58 @@ class SPObject(sprite.Sprite):
     def tick(dt: float) -> None:
         # Iterate over all objects
         for obj in SPObject.ALL_OBJS:
+            # Perform changes based on keyboard input
+            if obj.has_focus:
+                obj.checkKeys()
             # Get the new location
             new_x: float = obj.x + obj.x_vel
             new_y: float = obj.y + obj.y_vel
             # Update the location
             obj.update(new_x, new_y)
 
+        # Check for collisions after moving
+        SPObject.checkCollisions()
+
+    # Pre: None
+    # Post: All objects have been checked for collisions
+    # Descr: Check for collisions
+    def checkCollisions() -> None:
+        # Iterate over every object
+        for idx, obj in enumerate(SPObject.ALL_OBJS):
+            # Compare to every other object
+            for idx2, obj2 in enumerate(SPObject.ALL_OBJS):
+                # Check if they are the same object
+                if idx == idx2:
+                    continue
+                if obj.hasCollided(obj2):
+                    obj.onCollision(obj2)
+                    obj2.onCollision(obj)
+
     # ABSTRACT FUNCTIONS MEANT TO BE OVERLOADED
+
+    # Pre: Objects have collied
+    # Post: Action to perform on collision is performed
+    # Descr: Performs an function upon colliding -> overload
+    def onCollision(self, obj) -> None:
+        pass
+
+    # Pre: None
+    # Post: Action is performed based on key inputs
+    # Descr: Performs an action based on keyboard input
+    def checkKeys(self) -> None:
+        pass
 
     # Pre: Object is off<side> of the screen
     # Post: Action is performed due to being off screen
     # Descr: Performs an action upon leaving the screen
-    def offTop(self) -> None:
-        print("SPObject: OffTop")
+    def offTop(self, screen_height: int) -> None:
         pass
 
     def offBottom(self) -> None:
-        print("SPObject: offBottom")
+        pass
+
+    def offRight(self, screen_width: int) -> None:
         pass
 
     def offLeft(self) -> None:
-        print("SPObject: offLeft")
-        pass
-
-    def offRight(self) -> None:
-        print("SPObject: offRight")
         pass
