@@ -1,7 +1,7 @@
 # The window is where everything is drawn and where everything is connected to
 
 from pyglet import clock, window
-from .import SPInputHandler
+from .import SPInputHandler as IH
 from .SPObject import SPObject
 
 
@@ -12,18 +12,19 @@ class SPWindow(window.Window):
     # Descr: Create a new window
     def __init__(self, width: int = 0, height: int = 0, title: str = None) -> None:
         # Call the super constructor -> pyglet.window.Window
-        super(SPWindow, self).__init__(width, height, title)
+        super(SPWindow, self).__init__(width, height, title, vsync=False)
+        
         # Set up the controls, including a controller if applicable
         self.attachHandlers()
         # Clock to call drawFrame 60 times a second
-        clock.schedule_interval(self.drawFrame, 1 / 60.0)
+        clock.schedule_interval(self.gameLoop, 1 / 60.0)
 
     # Pre: The calling object has been instatiated correctly
     # Post: Event Handlers are setup for the window/game
     # Descr: Set the event handlers with the funcs from SPInputHandler.py
     def attachHandlers(self) -> None:
-        self.on_key_press = SPInputHandler.on_key_press
-        self.on_key_release = SPInputHandler.on_key_release
+        self.on_key_press = IH.on_key_press
+        self.on_key_release = IH.on_key_release
 
     # Pre: Passed an object with a location
     # Post: Calls the objects off<Direction> and returns flag
@@ -35,23 +36,32 @@ class SPWindow(window.Window):
             obj.offLeft()
             offscreen = True
         elif obj.x + obj.width > self.width:
-            obj.offRight()
+            obj.offRight(self.width)
             offscreen = True
         # Makes sure the entire obj is off the screen
         elif obj.y < 0:
             obj.offBottom()
             offscreen = True
         elif obj.y + obj.height > self.height:
-            obj.offTop()
+            obj.offTop(self.height)
             offscreen = True
 
 
-    # Pre: None
-    # Post: All objects are drawn to the screen
-    # Descr: Called 60 times a second to draw all the objects to the screen
-    def drawFrame(self, dt: float) -> None:
+    def gameLoop(self, dt: float) -> None:
+        # Logging for perf
+        if(dt > 0.018):
+            print("Tick took too long -> {}".format(dt))
+
+        # Clear the screen
         self.clear()
-        # Iterate over all created objects
+        # Iterate over all the objects and draw them
         for obj in SPObject.ALL_OBJS:
-            self.checkOffScreen(obj)
-            obj.draw()
+            # Check object of key focus and add inputs
+            if obj.has_focus:
+                obj.checkKeys(IH.directions_pushed)
+            obj.update()  # Update objects location
+            self.checkOffScreen(obj)  # Check if the object is off the screen now 
+            obj.draw()  # Draw then object to the screen
+        # Check for any collisions
+        SPObject.checkCollisions()
+            

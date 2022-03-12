@@ -1,7 +1,6 @@
 # All objects in the game should be created with this object or extend it
 
-from pyglet import clock, image, sprite, window
-from . import SPInputHandler as IH
+from pyglet import image, sprite, window
 
 
 class SPObject(sprite.Sprite):
@@ -26,8 +25,6 @@ class SPObject(sprite.Sprite):
         self.has_focus = has_focus
         # Add the created object to the list of objects
         SPObject.ALL_OBJS.append(self)
-        # Schedule the update function to be called every 60 seconds
-        clock.schedule_interval(SPObject.tick, 1 / 60.0)
 
     # Pre: None
     # Post: Object velocity changed to move direction
@@ -57,23 +54,12 @@ class SPObject(sprite.Sprite):
             and self.y + self.height > obj.y
         )
 
-    # Pre: None
-    # Post: All objects location has been updated with velocity
-    # Descr: Update the objects location with their velocity
-    def tick(dt: float) -> None:
-        # Iterate over all objects
-        for obj in SPObject.ALL_OBJS:
-            # Perform changes based on keyboard input
-            if obj.has_focus:
-                obj.checkKeys()
-            # Get the new location
-            new_x: float = obj.x + obj.x_vel
-            new_y: float = obj.y + obj.y_vel
-            # Update the location
-            obj.update(new_x, new_y)
-
-        # Check for collisions after moving
-        SPObject.checkCollisions()
+    def update(self) -> None:
+        # Get new location
+        new_x: float = self.x + self.x_vel
+        new_y: float = self.y + self.y_vel 
+        # Update the location  w/ the new location
+        super(SPObject, self).update(new_x, new_y)
 
     # Pre: None
     # Post: All objects have been checked for collisions
@@ -101,7 +87,7 @@ class SPObject(sprite.Sprite):
     # Pre: None
     # Post: Action is performed based on key inputs
     # Descr: Performs an action based on keyboard input
-    def checkKeys(self) -> None:
+    def checkKeys(self, keys_pressed) -> None:
         pass
 
     # Pre: Object is off<side> of the screen
